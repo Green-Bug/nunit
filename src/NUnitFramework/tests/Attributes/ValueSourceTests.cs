@@ -24,11 +24,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using NUnit.Framework.Compatibility;
 using NUnit.Framework.Interfaces;
-using NUnit.Framework.Internal;
-using NUnit.Framework.Internal.Builders;
 using NUnit.TestUtilities;
 
 namespace NUnit.Framework.Attributes
@@ -51,12 +47,14 @@ namespace NUnit.Framework.Attributes
             }
         }
 
+#if !PORTABLE // See issue #1232
         [Test]
         public void ValueSourceCanBeInheritedStaticProperty(
             [ValueSource("InheritedStaticProperty")] bool source)
         {
             Assert.AreEqual(true, source);
         }
+#endif
 
         [Test]
         public void ValueSourceMayNotBeInstanceProperty()
@@ -132,8 +130,8 @@ namespace NUnit.Framework.Attributes
 
         [Test, Sequential]
         public void MultipleArguments(
-            [ValueSource("Numerators")] int n, 
-            [ValueSource("Denominators")] int d, 
+            [ValueSource("Numerators")] int n,
+            [ValueSource("Denominators")] int d,
             [ValueSource("Quotients")] int q)
         {
             Assert.AreEqual(q, n / d);
@@ -178,51 +176,6 @@ namespace NUnit.Framework.Attributes
                 dataList.Add(8);
 
                 return dataList;
-            }
-
-            public static IEnumerable<int> ForeignNullResultProvider()
-            {
-                return null;
-            }
-        }
-
-        public static string NullSource = null;
-
-        public static IEnumerable<int> NullDataSourceProvider()
-        {
-            return null;
-        }
-
-        public static IEnumerable<int> NullDataSourceProperty
-        {
-            get { return null; }
-        }
-
-        [Test, Explicit("Null or nonexisting data sources definitions should not prevent other tests from run #1121")]
-        public void ValueSourceMayNotBeNull(
-            [ValueSource("NullSource")] string nullSource,
-            [ValueSource("NullDataSourceProvider")] string nullDataSourceProvided,
-            [ValueSource(typeof(ValueProvider), "ForeignNullResultProvider")] string nullDataSourceProvider,
-            [ValueSource("NullDataSourceProperty")] int nullDataSourceProperty,
-            [ValueSource("SomeNonExistingMemberSource")] int nonExistingMember)
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        public void ValueSourceAttributeShouldThrowInsteadOfReturningNull()
-        {
-            var method = new MethodWrapper(GetType(), "ValueSourceMayNotBeNull");
-            var parameters = method.GetParameters();
-
-            foreach (var parameter in parameters)
-            {
-                var dataSource = parameter.GetCustomAttributes<IParameterDataSource>(false)[0];
-
-                Assert.Throws<InvalidDataSourceException>(() =>
-                {
-                    var data = dataSource.GetData(parameter);
-                }); 
             }
         }
     }

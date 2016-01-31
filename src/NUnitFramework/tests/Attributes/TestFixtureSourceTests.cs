@@ -38,7 +38,6 @@ namespace NUnit.Framework.Attributes
         [TestCase(typeof(StaticField_DifferentClass))]
         [TestCase(typeof(StaticProperty_DifferentClass))]
         [TestCase(typeof(StaticMethod_DifferentClass))]
-        [TestCase(typeof(StaticProperty_InheritedClass))]
         [TestCase(typeof(IEnumerableSource))]
         [TestCase(typeof(SourceReturnsObjectArray))]
         [TestCase(typeof(SourceReturnsFixtureParameters))]

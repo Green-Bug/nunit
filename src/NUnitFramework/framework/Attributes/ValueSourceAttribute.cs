@@ -108,47 +108,36 @@ namespace NUnit.Framework
             MemberInfo[] members = sourceType.GetMember(SourceName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 
-            var dataSource = GetDataSourceValue(members);
-
-            if (dataSource == null)
+            if (members.Length == 1)
             {
-                ThrowInvalidDataSourceException();
-            }
+                MemberInfo member = members[0];
 
-            return dataSource;
-        }
+                var field = member as FieldInfo;
+                if (field != null)
+                {
+                    if (field.IsStatic)
+                        return (IEnumerable)field.GetValue(null);
 
-        private static IEnumerable GetDataSourceValue(MemberInfo[] members)
-        {
-            if (members.Length != 1) return null;
+                    ThrowInvalidDataSourceException();
+                }
 
-            MemberInfo member = members[0];
+                var property = member as PropertyInfo;
+                if (property != null)
+                {
+                    if (property.GetGetMethod(true).IsStatic)
+                        return (IEnumerable)property.GetValue(null, null);
 
-            var field = member as FieldInfo;
-            if (field != null)
-            {
-                if (field.IsStatic)
-                    return (IEnumerable)field.GetValue(null);
+                    ThrowInvalidDataSourceException();
+                }
 
-                ThrowInvalidDataSourceException();
-            }
+                var m = member as MethodInfo;
+                if (m != null)
+                {
+                    if (m.IsStatic)
+                        return (IEnumerable)m.Invoke(null, null);
 
-            var property = member as PropertyInfo;
-            if (property != null)
-            {
-                if (property.GetGetMethod(true).IsStatic)
-                    return (IEnumerable)property.GetValue(null, null);
-
-                ThrowInvalidDataSourceException();
-            }
-
-            var m = member as MethodInfo;
-            if (m != null)
-            {
-                if (m.IsStatic)
-                    return (IEnumerable)m.Invoke(null, null);
-
-                ThrowInvalidDataSourceException();
+                    ThrowInvalidDataSourceException();
+                }
             }
 
             return null;
@@ -156,9 +145,9 @@ namespace NUnit.Framework
 
         private static void ThrowInvalidDataSourceException()
         {
-            throw new InvalidDataSourceException("The sourceName specified on a ValueSourceAttribute must refer to a non null static field, property or method.");
+            throw new InvalidDataSourceException("The sourceName specified on a ValueSourceAttribute must refer to a static field, property or method.");
         }
 
-        #endregion
+#endregion
     }
 }

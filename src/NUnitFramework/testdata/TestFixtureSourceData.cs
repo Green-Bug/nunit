@@ -78,18 +78,10 @@ namespace NUnit.TestData.TestFixtureSourceData
     {
         public StaticProperty_SameClass(string arg) : base(arg, "StaticPropertyInClass") { }
 
-        public StaticProperty_SameClass(string arg, string expected) : base(arg, expected) { }
-
-        public static object[] StaticProperty
+        static object[] StaticProperty
         {
             get { return new object[] { new object[] { "StaticPropertyInClass" } }; }
         }
-    }
-
-    [TestFixtureSource("StaticProperty")]
-    public class StaticProperty_InheritedClass : StaticProperty_SameClass 
-    {
-        public StaticProperty_InheritedClass (string arg) : base(arg, "StaticPropertyInClass") { }
     }
 
     [TestFixtureSource("StaticMethod")]
@@ -315,11 +307,6 @@ namespace NUnit.TestData.TestFixtureSourceData
 
     class SourceData
     {
-        public static object[] InheritedStaticProperty
-        {
-            get { return new object[] { new object[] { "StaticProperty" } }; }
-        }
-
         static object[] StaticField = new object[] { "StaticField" };
 
         static object[] StaticProperty

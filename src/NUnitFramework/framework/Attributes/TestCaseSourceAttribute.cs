@@ -216,7 +216,7 @@ namespace NUnit.Framework
                 return Reflect.Construct(sourceType) as IEnumerable;
 
             MemberInfo[] members = sourceType.GetMember(SourceName,
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
 
             if (members.Length == 1)
             {

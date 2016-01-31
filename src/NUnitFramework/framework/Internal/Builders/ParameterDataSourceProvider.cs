@@ -64,8 +64,15 @@ namespace NUnit.Framework.Internal.Builders
 
             foreach (IParameterDataSource source in parameter.GetCustomAttributes<IParameterDataSource>(false))
             {
-                foreach (object item in source.GetData(parameter))
-                    data.Add(item);
+                try
+                {
+                    foreach (object item in source.GetData(parameter))
+                        data.Add(item);
+                }
+                catch(Exception ex)
+                {
+                    throw;
+                }
             }
 
             return data;

@@ -199,31 +199,35 @@ namespace NUnit.Framework.Compatibility
             type = type.GetTypeInfo().BaseType;
             if (type != null)
             {
+                // Skip statics on all base classes
                 var baseMembers = type.GetAllMembers();
-                members.AddRange(baseMembers.Where(NotPrivate));
+                members.AddRange(DiscardStatic(baseMembers));
             }
             return members;
         }
 
-        static bool NotPrivate(MemberInfo info)
+        static IEnumerable<MemberInfo> DiscardStatic(IEnumerable<MemberInfo> members)
         {
-            var pinfo = info as PropertyInfo;
-            if (pinfo != null)
-                return pinfo.GetMethod.IsPrivate == false;
+            foreach(var info in members)
+            {
+                var einfo = info as EventInfo;
+                if (einfo != null && einfo.RaiseMethod.IsPublic && !einfo.RaiseMethod.IsStatic)
+                    yield return einfo;
 
-            var finfo = info as FieldInfo;
-            if (finfo != null)
-                return finfo.IsPrivate == false;
+                var finfo = info as FieldInfo;
+                if (finfo != null && finfo.IsPublic && !finfo.IsStatic)
+                    yield return finfo;
 
-            var minfo = info as MethodBase;
-            if (minfo != null)
-                return minfo.IsPrivate == false;
+                var minfo = info as MethodBase;
+                if (minfo != null && minfo.IsPublic && !minfo.IsStatic)
+                    yield return minfo;
 
-            var einfo = info as EventInfo;
-            if (einfo != null)
-                return einfo.RaiseMethod.IsPrivate == false;
-
-            return true;
+                var pinfo = info as PropertyInfo;
+                if (pinfo != null && 
+                    ((pinfo.GetMethod != null && !pinfo.GetMethod.IsStatic) || (pinfo.SetMethod != null && !pinfo.SetMethod.IsStatic)) &&
+                    ((pinfo.GetMethod == null || !pinfo.GetMethod.IsPrivate) && (pinfo.SetMethod == null || !pinfo.SetMethod.IsPrivate)))
+                    yield return pinfo;
+            }
         }
 
         /// <summary>

@@ -32,19 +32,13 @@ using NUnit.TestUtilities;
 namespace NUnit.Framework.Attributes
 {
     [TestFixture]
-    public class TestCaseSourceTests //: TestSourceMayBeInherited
+    public class TestCaseSourceTests
     {
         [Test, TestCaseSource("StaticProperty")]
         public void SourceCanBeStaticProperty(string source)
         {
             Assert.AreEqual("StaticProperty", source);
         }
-
-        //[Test, TestCaseSource("InheritedStaticProperty")]
-        //public void TestSourceCanBeInheritedStaticProperty(bool source)
-        //{
-        //    Assert.AreEqual(true, source);
-        //}
 
         static IEnumerable StaticProperty
         {
@@ -314,13 +308,5 @@ namespace NUnit.Framework.Attributes
             }
         }
         #endregion
-    }
-
-    public class TestSourceMayBeInherited
-    {
-        protected static IEnumerable<bool> InheritedStaticProperty
-        {
-            get { yield return true; }
-        }
     }
 }
